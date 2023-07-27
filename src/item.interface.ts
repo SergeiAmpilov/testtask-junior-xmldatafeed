@@ -1,12 +1,12 @@
 export interface IProduct {
-  name: string;
-  region: string;
-  breadCrumb: {
+  name?: string;
+  region?: string;
+  breadCrumb?: {
     [key: string]: string
   };
-  price: number;
+  price?: string | number;
   priceOld?: number;
-  stock: boolean;
-  imgUrl: string[];
-  url: string;
+  stock?: boolean;
+  imgUrl?: string[];
+  url?: string | null;
 }

@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
-import { IProduct } from './item.interface';
 import { URL_LIST } from './url.list';
+import { IProduct } from './item.interface';
 
 
 
@@ -9,7 +9,7 @@ async function init() {
   
 
   const productList: IProduct[] = [];
-  const baseUrl = 'https://www.toy.ru/catalog/boy_transport/';
+  
 
   for (const baseUrl of URL_LIST) {
     console.log(baseUrl);
@@ -26,13 +26,34 @@ async function init() {
       waitUntil: "domcontentloaded"
     });
 
-    
+    const result: IProduct[] = await page.evaluate(() => {
 
+      let prod: IProduct[] = [];
+
+      document
+        .querySelectorAll('.product-card')
+        .forEach((elCard) => 
+        {
+
+          const name = elCard.querySelector('.product-name')?.innerHTML.toString();          
+          const url = elCard.querySelector('.product-name')?.getAttribute('href');
+          const price = elCard.querySelector('.price span span')?.innerHTML;          
+
+          prod.push({ name, url, price });          
+        });
+
+      return prod;
+
+    });
 
     await browser.close();
+
+    productList.push(...result);
+
   }
-  
-  
+
+  console.log(productList.length);
+  console.log(productList);
   console.log('End   script', new Date().toLocaleString('ru-RU'));
 }
 
