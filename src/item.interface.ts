@@ -4,7 +4,7 @@ export interface IProduct {
   breadCrumb?: {
     [key: string]: string
   };
-  price?: string | number;
+  price?: string;
   priceOld?: number;
   stock?: boolean;
   imgUrl?: string[];
