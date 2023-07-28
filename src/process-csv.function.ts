@@ -34,8 +34,4 @@ export const processCsv = async (data: IProduct[]) => {
     }]);  
   }
 
-
-  console.log('writing done');
-
-
 }

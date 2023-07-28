@@ -1,7 +1,7 @@
 import { Browser } from "puppeteer";
 import { createObjectCsvWriter } from 'csv-writer';
-import { IProduct } from "../src/item.interface";
-import { DOMAIN } from "../src/url.list";
+import { IProduct } from "../item.interface";
+import { DOMAIN } from "../url.list";
 
 
 
@@ -110,7 +110,7 @@ export class ProductParser {
 
   public async makeCsv(prefix?: string) {
 
-    const filename = (prefix ?? '') + `data-${Math.floor(Date.now()/1000)}.csv`;
+    const filename = (prefix ? `${prefix}-` : '') + `data-${Math.floor(Date.now()/1000)}.csv`;
 
     const csvWriter = createObjectCsvWriter({
       path: filename,
