@@ -1,4 +1,4 @@
-import { Browser } from "puppeteer";
+import { Browser, Page } from "puppeteer";
 import { createObjectCsvWriter } from 'csv-writer';
 import { IProduct } from "../item.interface";
 import { DOMAIN } from "../url.list";
@@ -13,6 +13,8 @@ export class ProductParser {
   constructor(
     private readonly urlList: string[],
     private readonly browser: Browser,
+    private readonly csvWriter,
+    private region?: string,
   ) {
 
     this._products = [];
@@ -21,12 +23,15 @@ export class ProductParser {
 
   public async parseProductList() {
     
-    let page = await this.browser.newPage();
-
     for (const baseUrl of this.urlList) {
 
-      await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  
+      const page = await this.getPage(baseUrl);
+
+      for (let index = 0; index < 10; index++) {
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 1s
+      }
+
+
       const result: IProduct[] = await page.evaluate(() => {
   
         let prod: IProduct[] = [];      
@@ -47,21 +52,21 @@ export class ProductParser {
         return prod;
       });
       
-      this._products.push(...result);    
+      this._products.push(...result);
+      page.close();
     }
-
-    page.close();
+    
   }
 
   /* refill products from cards */
   public async refillProducts() {
 
-    let page = await this.browser.newPage();
+    // let page = await this.browser.newPage();
 
     for (const product of this._products) {
 
       product.url = DOMAIN + product.url;
-      await page.goto(product.url, { waitUntil: "domcontentloaded" });
+      const page = await this.getPage(product.url);
   
       // stock
       product.stock = await page.evaluate(() => {
@@ -103,32 +108,14 @@ export class ProductParser {
                 .replace('\t', '').replace('\n', '').trim();
       });
   
+      page.close();
     }
 
-    page.close();
   }
 
-  public async makeCsv(prefix?: string) {
-
-    const filename = (prefix ? `${prefix}-` : '') + `data-${Math.floor(Date.now()/1000)}.csv`;
-
-    const csvWriter = createObjectCsvWriter({
-      path: filename,
-      header: [
-        {id: 'name', title: 'NAME'},
-        {id: 'region', title: 'REGION'},
-        {id: 'breadCrumb', title: 'BREADCRUMB'},
-        {id: 'price', title: 'PRICE'},
-        {id: 'priceOld', title: 'PRICE-OLD'},
-        {id: 'stock', title: 'STOCK'},
-        {id: 'imgUrl', title: 'IMG-URL'},
-        {id: 'url', title: 'URL'},
-      ]
-    });
-  
-  
+  public async makeCsv() {
     for (const row of this._products) {
-      await csvWriter.writeRecords([{
+      await this.csvWriter.writeRecords([{
         name: row.name,
         region: row.region,
         breadCrumb: JSON.stringify(row.breadCrumb),
@@ -139,10 +126,31 @@ export class ProductParser {
         url: row.url,
       }]);  
     }
-
   }
 
+  private async getPage(url: string): Promise<Page> {
 
+    const page: Page = await this.browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+
+    // transform region
+    if (this.region) {
+      await page.evaluate(() => {
+        const element: HTMLElement | null = document.querySelector('.top-location .select-city-link a');
+        element?.click();
+      });
+
+      await page.type('input[name=city]', this.region);
+  
+      for (let index = 0; index < 10; index++) {
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Wait 1s
+      }
+
+      await page.click('#region #savecity');    
+    }
+
+    return page;
+  }
 
   get products() {
     return this._products;
