@@ -5,6 +5,6 @@ export interface IProduct {
   price?: string;
   priceOld?: string | undefined | null;
   stock?: any;
-  imgUrl?: (string | null | undefined)[];
+  imgUrl?: any[];
   url?: string | null;
 }

@@ -44,10 +44,10 @@ export class ProductParser {
             const name = elCard.querySelector('.product-name')?.innerHTML.toString().replace('\t', '').replace('\n', '').trim();;          
             const url = elCard.querySelector('.product-name')?.getAttribute('href');
             const price = elCard.querySelector('.price span span')?.innerHTML.toString().trim();
-            const priceOld = elCard.querySelector('.price-discount')?.textContent?.toString().trim()
-            ;
+            const priceOld = elCard.querySelector('.price-discount')?.textContent?.toString().trim();
+            const imgUrl = [];
             
-            prod.push({ name, url, price, priceOld });          
+            prod.push({ name, url, price, priceOld, imgUrl });          
           });
   
         return prod;
@@ -80,8 +80,7 @@ export class ProductParser {
         document
           .querySelector('.slick-list')?.querySelectorAll('.slick-slide .img-fluid').forEach((imgDomElement) => {
             let imgUrl = imgDomElement.getAttribute('src')?.toString();
-            imgUrl = imgUrl ?? '';
-            arImg.push(imgUrl);
+            arImg.push(imgUrl ? imgUrl : '');
           })
   
         return arImg;
@@ -91,7 +90,7 @@ export class ProductParser {
   
   
       // breadCrumb
-      product.breadCrumb = await page.evaluate(() => {
+      const brCmb = await page.evaluate(() => {
         const bcListItems: any[] = [];
         document.querySelector('.breadcrumb')?.querySelectorAll('a.breadcrumb-item').forEach((el) => {
           bcListItems.push({
@@ -100,6 +99,12 @@ export class ProductParser {
           });
         })
         return bcListItems;
+      });
+      product.breadCrumb = brCmb.map(({ url, text}) => {
+        return {
+          url: `${DOMAIN}${url}`,
+          text,
+        }
       });
   
       // region
