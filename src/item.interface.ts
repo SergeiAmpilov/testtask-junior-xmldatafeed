@@ -1,12 +1,10 @@
 export interface IProduct {
   name?: string;
-  region?: string;
-  breadCrumb?: {
-    [key: string]: string
-  };
+  region?: string | null | undefined;
+  breadCrumb?: any[];
   price?: string;
-  priceOld?: number;
-  stock?: boolean;
-  imgUrl?: string[];
+  priceOld?: string | undefined | null;
+  stock?: any;
+  imgUrl?: (string | null | undefined)[];
   url?: string | null;
 }
