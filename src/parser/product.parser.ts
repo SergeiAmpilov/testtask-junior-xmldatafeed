@@ -14,6 +14,7 @@ export class ProductParser {
     private readonly urlList: string[],
     private readonly browser: Browser,
     private readonly csvWriter,
+    private worksheet,
     private region?: string,
   ) {
 
@@ -151,6 +152,40 @@ export class ProductParser {
 
     return page;
   }
+
+  public storeXl() {
+    
+    for (let index = 0; index < this.products.length; index++) {
+      const element = this.products[index];
+      const row = index + 1;
+
+      this.worksheet.cell(row, 1).string(element.name ?? '');
+      this.worksheet.cell(row, 2).string(element.region ?? '');
+      this.worksheet.cell(row, 3).string(element.price ?? '');
+      this.worksheet.cell(row, 4).string(element.priceOld ?? '');
+      this.worksheet.cell(row, 5).string(element.stock ?? '');
+      this.worksheet.cell(row, 6).string(element.url ?? '');
+
+      let col = 7;
+
+      if (element.breadCrumb?.length) {
+        for (const bc of element.breadCrumb) {          
+          this.worksheet.cell(row, col).string(bc.text ?? '');
+          col++;
+          this.worksheet.cell(row, col).string(bc.url ?? '');
+          col++;
+        }
+      }
+
+      if (element.imgUrl?.length) {
+        for (const imgUrl of element.imgUrl) {
+          this.worksheet.cell(row, col).string(imgUrl ?? '');
+          col++;
+        }
+      }
+    }
+
+  } 
 
   get products() {
     return this._products;

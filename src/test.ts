@@ -32,17 +32,6 @@ async function test() {
 
   
 
-
-
-  // await page.evaluate(() => {
-  //   const element: HTMLFormElement | null = document.querySelector('#region form');
-  //   element?.submit()
-  // });
-  
-
-
-  // browser.close();
-
 }
 
 
