@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 import { DOMAIN, ROOT_CATALOG, URL_LIST } from './url.list';
 import { IProduct } from './item.interface';
+import { processCsv } from './process-csv.function';
 
 
 const getBrowser = () => {
@@ -40,7 +41,8 @@ async function init() {
           const name = elCard.querySelector('.product-name')?.innerHTML.toString().replace('\t', '').replace('\n', '').trim();;          
           const url = elCard.querySelector('.product-name')?.getAttribute('href');
           const price = elCard.querySelector('.price span span')?.innerHTML.toString().trim();
-          const priceOld = elCard.querySelector('.price-discount')?.textContent?.toString().trim();
+          const priceOld = elCard.querySelector('.price-discount')?.textContent?.toString().trim()
+          ;
           
           prod.push({ name, url, price, priceOld });          
         });
@@ -103,6 +105,8 @@ async function init() {
   await browser.close();
   
   console.log(productList);
+
+  processCsv(productList);
   console.log('End   script', new Date().toLocaleString('ru-RU'));
 }
 
