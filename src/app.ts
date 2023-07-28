@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { Browser } from 'puppeteer';
 import { DOMAIN, ROOT_CATALOG, URL_LIST } from './url.list';
 import { IProduct } from './item.interface';
 import { processCsv } from './process-csv.function';
@@ -17,7 +17,7 @@ async function init() {
 
  
   
-  const browser = await puppeteer.launch({
+  const browser: Browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
   });
