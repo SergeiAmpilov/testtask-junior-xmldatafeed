@@ -23,6 +23,7 @@ async function parseProductCard(product: Product, region?: string): Promise<Prod
   const browser: Browser = await puppeteer.launch({
     headless: false,
     defaultViewport: null,
+    args: ['--proxy-server=78.110.195.242:7080']
   });
 
   const page: Page = await getPage(browser, url, region);
