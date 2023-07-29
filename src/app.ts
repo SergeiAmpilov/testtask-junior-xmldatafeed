@@ -1,61 +1,41 @@
-import puppeteer, { Browser } from 'puppeteer';
-import { URL_LIST } from './url.list';
-import { ProductParser } from './parser/product.parser';
-import { createObjectCsvWriter } from 'csv-writer';
-const xl = require('excel4node');
+import { Product, ProductPack } from "./types";
+import { fork } from 'child_process';
+import { URL_LIST } from "./url.list";
 
 
-async function init() {
 
-  console.log('Start script', new Date().toLocaleString('ru-RU'));
 
-  const filename = `data.csv`;
+async function start() {
 
-  const csvWriter = createObjectCsvWriter({
-    path: filename,
-    header: [
-      {id: 'name', title: 'NAME'},
-      {id: 'region', title: 'REGION'},
-      {id: 'breadCrumb', title: 'BREADCRUMB'},
-      {id: 'price', title: 'PRICE'},
-      {id: 'priceOld', title: 'PRICE-OLD'},
-      {id: 'stock', title: 'STOCK'},
-      {id: 'imgUrl', title: 'IMG-URL'},
-      {id: 'url', title: 'URL'},
-    ]
-  });
+  const products: Product[] = [];
 
+  const productPack: ProductPack[] = await Promise.all(URL_LIST.map((url) => parseProductListFork(url)));
+  productPack.map((arr) => { products.push(...arr)});
   
-  const wb = new xl.Workbook();
-  const ws = wb.addWorksheet('Sheet 2');
-
-
-  
-
-  const browser: Browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-  });
-
-  const productParser: ProductParser = new ProductParser(URL_LIST, browser, csvWriter, ws);
-  await productParser.parseProductList();
-  await productParser.refillProducts();
-  await productParser.makeCsv();
-  productParser.storeXl();
-
-  const productParserRostov: ProductParser = new ProductParser(URL_LIST, browser, csvWriter, ws, 'г Ростов-на-Дону');
-  await productParserRostov.parseProductList();
-  await productParserRostov.refillProducts();
-  await productParserRostov.makeCsv();
-  productParserRostov.storeXl();
-
-
-  await browser.close();
-
-  await wb.write(`data-${Math.floor(Date.now() / 1000)}.xls`);
-  console.log('End   script', new Date().toLocaleString('ru-RU'));
+  console.log(products);
+  console.log(products.length);
 
 }
 
+start();
 
-init();
+
+
+function parseProductListFork(url: string, region?: string): Promise<ProductPack> {
+
+  return new Promise((resolve, reject) => {
+
+    const forkProcess = fork('./dist/parse.product.list.js');
+    forkProcess.send({ url, region });
+
+    forkProcess.on('message', (msg: Product[]) => {
+      resolve(msg);
+    });
+
+    forkProcess.on('error', (err) => {
+      reject(err);
+    });
+
+  });
+
+}

@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./dist/app",
-    "test": "node ./dist/test"
+    "start": "node ./dist/app"
   },
   "keywords": [],
   "author": "",
