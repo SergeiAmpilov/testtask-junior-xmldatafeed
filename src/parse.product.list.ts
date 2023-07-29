@@ -1,13 +1,18 @@
 import { getPage } from "./page.service";
 import { ParsedString, Product } from "./types";
-import puppeteer, { Browser, Page } from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
 import { DOMAIN } from "./url.list";
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
 
 
 
 
 
 async function parseProductList(url: string, region?: string): Promise<Product[]> {
+
+  puppeteer.use(StealthPlugin());
 
   const browser: Browser = await puppeteer.launch({
     headless: false,
