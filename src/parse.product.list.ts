@@ -1,6 +1,7 @@
 import { getPage } from "./page.service";
 import { ParsedString, Product } from "./types";
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { DOMAIN } from "./url.list";
 
 
 
@@ -35,7 +36,13 @@ async function parseProductList(url: string, region?: string): Promise<Product[]
   });
 
   await browser.close();
-  return products;
+
+  return products.map((prod) => {
+    return {
+      ...prod,
+      url: `${DOMAIN}${prod.url}`
+    }
+  });
 
 }
 

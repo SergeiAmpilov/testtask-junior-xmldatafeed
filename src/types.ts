@@ -2,7 +2,7 @@ export type ParsedString = string | null | undefined;
 
 export type BreadCrumb = {
   url?: ParsedString;
-  name?: ParsedString;
+  text?: ParsedString;
 }
 
 export type Product = {

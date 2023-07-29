@@ -8,3 +8,4 @@ export const URL_LIST = [
 
 export const DOMAIN = 'https://www.toy.ru';
 export const ROOT_CATALOG = 'https://www.toy.ru/catalog/boy_transport/';
+export const MAX_STREAMS_COUNT = 2;
